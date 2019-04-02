@@ -11,6 +11,6 @@ use App\Pheanstalkd;
 
 $pheanstalkd = Pheanstalkd::getInstance();
 
-$status = $pheanstalkd->listTubes();
+$res = $pheanstalkd->stats();
 
-var_dump($status);
+var_dump(json_encode($res));

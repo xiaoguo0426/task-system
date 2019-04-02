@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: xiaoguo
  * Date: 19-4-2
- * Time: 下午9:24
+ * Time: 下午10:46
  */
 
 require 'vendor/autoload.php';
@@ -12,10 +12,10 @@ use App\Pheanstalkd;
 
 $pheanstalkd = Pheanstalkd::getInstance();
 
-$tubeName = 'testTube';
+$res = $pheanstalkd->stats();
 
-while (1) {
-    $job = $pheanstalkd->watch($tubeName)->reserve();
-    var_dump($job);
-    $pheanstalkd->delete($job);
+foreach ($res as $key => $value){
+
+    echo $key.'--'.$value.PHP_EOL;
+
 }

@@ -1,0 +1,111 @@
+#!/usr/bin/php
+<?php
+require 'vendor/autoload.php';
+use App\Pheanstalkd;
+class MyPheanstalk{
+
+    public static function showHelps(){
+    echo <<<HELP
+\e[33m命令及参数:\e[0m
+\e[31m  task help         查看所有命令 \e[0m
+\e[32m  task stats        查看beanstalkd状态 \e[0m
+\e[33m  task listTubes    列出所有管道 \e[0m
+
+HELP;
+
+    }
+
+    public static function showStats(){
+
+      $pheanstalkd = Pheanstalkd::getInstance();
+
+      $stats = $pheanstalkd->stats();
+      echo <<<STATS
+id:{$stats['id']}
+hostname:{$stats['hostname']}
+pid:{$stats['pid']}
+version:{$stats['version']}
+uptime:{$stats['uptime']}
+current-jobs-urgent {$stats['current-jobs-urgent']}
+current-jobs-ready {$stats['current-jobs-ready']}
+current-jobs-reserved {$stats['current-jobs-reserved']}
+current-jobs-delayed {$stats['current-jobs-delayed']}
+current-jobs-buried {$stats['current-jobs-buried']}
+cmd-put {$stats['cmd-put']}
+cmd-peek {$stats['cmd-peek']}
+cmd-peek-ready {$stats['cmd-peek-ready']}
+cmd-peek-delayed {$stats['cmd-peek-delayed']}
+cmd-peek-buried {$stats['cmd-peek-buried']}
+cmd-reserve {$stats['cmd-reserve']}
+cmd-reserve-with-timeout {$stats['cmd-reserve-with-timeout']}
+cmd-delete {$stats['cmd-delete']}
+cmd-release {$stats['cmd-release']}
+cmd-use {$stats['cmd-use']}
+cmd-watch {$stats['cmd-watch']}
+cmd-ignore {$stats['cmd-ignore']}
+cmd-bury {$stats['cmd-bury']}
+cmd-kick {$stats['cmd-kick']}
+cmd-touch {$stats['cmd-touch']}
+cmd-stats {$stats['cmd-stats']}
+cmd-stats-job {$stats['cmd-stats-job']}
+cmd-stats-tube {$stats['cmd-stats-tube']}
+cmd-list-tubes {$stats['cmd-list-tubes']}
+cmd-list-tube-used {$stats['cmd-list-tube-used']}
+cmd-list-tubes-watched {$stats['cmd-list-tubes-watched']}
+cmd-pause-tube {$stats['cmd-pause-tube']}
+job-timeouts {$stats['job-timeouts']}
+total-jobs {$stats['total-jobs']}
+max-job-size {$stats['max-job-size']}
+current-tubes {$stats['current-tubes']}
+current-connections {$stats['current-connections']}
+current-producers {$stats['current-producers']}
+current-workers {$stats['current-workers']}
+current-waiting {$stats['current-waiting']}
+total-connections {$stats['total-connections']}
+rusage-utime {$stats['rusage-utime']}
+rusage-stime {$stats['rusage-stime']}
+binlog-oldest-index {$stats['binlog-oldest-index']}
+binlog-current-index {$stats['binlog-current-index']}
+binlog-records-migrated {$stats['binlog-records-migrated']}
+binlog-records-written {$stats['binlog-records-written']}
+binlog-max-size {$stats['binlog-max-size']}
+
+STATS;
+    }
+
+    public static function listTubes(){
+
+      $pheanstalkd = Pheanstalkd::getInstance();
+
+      $tubs = $pheanstalkd->listTubes();
+      foreach($tubs as $key => $value){
+          echo "ID:".$key."    ".$value.PHP_EOL;
+      }
+    }
+
+}
+
+$commandList = $argv;
+
+array_shift($commandList);
+
+$mainCommand = array_shift($commandList);
+
+switch($mainCommand){
+
+    case 'help':
+      MyPheanstalk::showHelps();
+      break;
+    case 'stats':
+      MyPheanstalk::showStats();
+      break;
+    case 'listTubes':
+        MyPheanstalk::listTubes();
+        break;
+
+    default:
+
+      MyPheanstalk::showHelps();
+
+
+}
