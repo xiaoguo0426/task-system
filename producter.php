@@ -11,6 +11,4 @@ use App\Pheanstalkd;
 
 $pheanstalkd = Pheanstalkd::getInstance();
 
-$res = $pheanstalkd->stats();
-
-var_dump(json_encode($res));
+$pheanstalkd->useTube('testTube')->put('test data');
