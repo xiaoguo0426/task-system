@@ -27,17 +27,24 @@ class Log
 
     public static function error($msg)
     {
+        $logName = self::getLogName(__FUNCTION__);
 
-        var_dump(self::$logName);
+
     }
 
     public static function warning($msg)
     {
 
+        $logName = self::getLogName(__FUNCTION__);
+
+
     }
 
     public function notice($msg)
     {
+
+        $logName = self::getLogName(__FUNCTION__);
+        
 
     }
 
