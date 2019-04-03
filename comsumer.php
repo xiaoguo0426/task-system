@@ -36,12 +36,13 @@ while (1) {
         //构建相应的消费者
         $class = "App\\Consumers\\" . $module . "\\" . $node;
 
-        if (!class_exists($class)) {
-            $pheanstalkd->bury($job);
-            throw new \Exception('Class ' . $class . ' not found!');
-        }
+//        if (!class_exists($class)) {
+//            $pheanstalkd->bury($job);
+//            throw new \Exception('Class ' . $class . ' not found!');
+//        }
 
-        $pheanstalkd->delete($job);
+        var_dump($job);
+//        $pheanstalkd->delete($job);
 
     } catch (\Exception $exception) {
 

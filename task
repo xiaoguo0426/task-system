@@ -11,19 +11,23 @@ class MyPheanstalk
     {
         echo <<<HELP
 \e[33m命令及参数:\e[0m
-\e[31m  task help               查看所有命令 \e[0m
-\e[32m  task stats              查看beanstalkd状态 \e[0m
-\e[33m  task listTubes          列出所有管道 \e[0m
-\e[34m  task clear     \$tube   清除执行管道的消息 \e[0m
-\e[35m  task clearAll           清除所有管道的消息 \e[0m
-\e[36m  task statsTube \$tube   列出管道消息 \e[0m
+\e[31m  task help                           查看所有命令 \e[0m
+\e[32m  task stats                          查看beanstalkd状态 \e[0m
+\e[33m  task listTubes                      列出所有管道 \e[0m
+\e[34m  task clear     \$tube               清除执行管道的消息 \e[0m
+\e[35m  task clearAll                       清除所有管道的消息 \e[0m
+\e[36m  task statsTube \$tube               列出管道消息 \e[0m
+\e[37m  task listTubesWatched               列出当前监听的管道 \e[0m
+\e[31m  task listTubeUsed                   列出当前被使用的管道 \e[0m
+\e[32m  task pauseTube \$tube  \$delay      指定管道设置延迟 \e[0m
+\e[33m  task resumeTube \$tube              取消管道延迟 \e[0m
 
 HELP;
 
     }
 
     /**
-     * 展示当前状态
+     * 查看beanstalkd状态
      */
     public static function showStats()
     {
@@ -165,6 +169,72 @@ STATS;
 
     }
 
+    /**
+     * 列出当前监听的管道
+     */
+    public static function listTubesWatched()
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        $tubes = $pheanstalkd->listTubesWatched();
+
+        foreach ($tubes as $tube) {
+            echo $tube . PHP_EOL;
+        }
+    }
+
+    /**
+     * 列出当前被使用的管道
+     */
+    public static function listTubeUsed()
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        $tube = $pheanstalkd->listTubeUsed();
+        echo $tube . PHP_EOL;
+
+    }
+
+    /**
+     * 指定管道设置延迟
+     * @param $tube
+     * @param int $delay
+     */
+    public static function pauseTube($tube, $delay = 60)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $pheanstalkd->pauseTube($tube, $delay);
+
+            echo 'pause tube ' . $tube . ' success~' . PHP_EOL;
+
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+
+    }
+
+    /**
+     * 取消管道延迟
+     * @param $tube
+     */
+    public static function resumeTube($tube)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $pheanstalkd->resumeTube($tube);
+
+            echo 'resume tube ' . $tube . ' success~' . PHP_EOL;
+
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+    }
+
 
 }
 
@@ -200,13 +270,43 @@ switch ($mainCommand) {
         MyPheanstalk::clearAll();
         break;
     case 'statsTube':
-        $tube = array_shift($commandList);//管道名称 如果为空，则清空全部消息
+        $tube = array_shift($commandList);//管道名称
 
         if ('' == $tube) {
             echo 'sorry,tube name is required.' . PHP_EOL;
             return;
         }
         MyPheanstalk::statsTube($tube);
+        break;
+    case 'listTubesWatched':
+        MyPheanstalk::listTubesWatched();
+        break;
+    case 'listTubeUsed':
+        MyPheanstalk::listTubeUsed();
+        break;
+    case 'pauseTube':
+        $tube = array_shift($commandList);//管道名称
+
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            return;
+        }
+
+        $delay = array_shift($commandList);
+
+        MyPheanstalk::pauseTube($tube, $delay);
+        break;
+    case 'resumeTube':
+        $tube = array_shift($commandList);//管道名称
+
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            return;
+        }
+
+        $delay = array_shift($commandList);
+
+        MyPheanstalk::resumeTube($tube);
         break;
     default:
         MyPheanstalk::showHelps();
