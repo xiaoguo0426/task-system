@@ -13,7 +13,7 @@ class User
 
     public function login($data)
     {
-        var_dump($data);
+        //TODO
     }
 
 }

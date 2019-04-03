@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afeef4410daee5a7cb288fa22c9ebfc9",
+    "content-hash": "7748a9bd5e5778b03098ce25debfd2cd",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -277,42 +277,6 @@
                 "simple-cache"
             ],
             "time": "2017-10-23T01:57:42+00:00"
-        },
-        {
-            "name": "topthink/think-log",
-            "version": "v1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/top-think/think-log.git",
-                "reference": "42294ad0cd9e29cb26f4265713607e97696d8760"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/top-think/think-log/zipball/42294ad0cd9e29cb26f4265713607e97696d8760",
-                "reference": "42294ad0cd9e29cb26f4265713607e97696d8760",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "think\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "liu21st",
-                    "email": "liu21st@gmail.com"
-                }
-            ],
-            "description": "think log",
-            "time": "2017-12-15T05:34:59+00:00"
         },
         {
             "name": "topthink/think-orm",
