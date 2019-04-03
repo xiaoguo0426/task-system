@@ -1,26 +1,37 @@
 #!/usr/bin/php
 <?php
 require 'vendor/autoload.php';
-use App\Pheanstalkd;
-class MyPheanstalk{
 
-    public static function showHelps(){
-    echo <<<HELP
+use App\Pheanstalkd;
+
+class MyPheanstalk
+{
+
+    public static function showHelps()
+    {
+        echo <<<HELP
 \e[33m命令及参数:\e[0m
-\e[31m  task help         查看所有命令 \e[0m
-\e[32m  task stats        查看beanstalkd状态 \e[0m
-\e[33m  task listTubes    列出所有管道 \e[0m
+\e[31m  task help               查看所有命令 \e[0m
+\e[32m  task stats              查看beanstalkd状态 \e[0m
+\e[33m  task listTubes          列出所有管道 \e[0m
+\e[34m  task clear     \$tube   清除执行管道的消息 \e[0m
+\e[35m  task clearAll           清除所有管道的消息 \e[0m
+\e[36m  task statsTube \$tube   列出管道消息 \e[0m
 
 HELP;
 
     }
 
-    public static function showStats(){
+    /**
+     * 展示当前状态
+     */
+    public static function showStats()
+    {
 
-      $pheanstalkd = Pheanstalkd::getInstance();
+        $pheanstalkd = Pheanstalkd::getInstance();
 
-      $stats = $pheanstalkd->stats();
-      echo <<<STATS
+        $stats = $pheanstalkd->stats();
+        echo <<<STATS
 id:{$stats['id']}
 hostname:{$stats['hostname']}
 pid:{$stats['pid']}
@@ -73,15 +84,87 @@ binlog-max-size {$stats['binlog-max-size']}
 STATS;
     }
 
-    public static function listTubes(){
+    /**
+     * 列出所有管道
+     */
+    public static function listTubes()
+    {
 
-      $pheanstalkd = Pheanstalkd::getInstance();
+        $pheanstalkd = Pheanstalkd::getInstance();
 
-      $tubs = $pheanstalkd->listTubes();
-      foreach($tubs as $key => $value){
-          echo "ID:".$key."    ".$value.PHP_EOL;
-      }
+        $tubs = $pheanstalkd->listTubes();
+        foreach ($tubs as $key => $value) {
+            echo "ID:" . $key . "    " . $value . PHP_EOL;
+        }
     }
+
+    /**
+     * 清除执行管道的消息
+     * @param $tube
+     */
+    public static function clear($tube)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+        try {
+
+            while (1) {
+                $job = $pheanstalkd->watch($tube)
+                    ->reserveWithTimeout(1);
+
+                if (NULL === $job) {
+                    break;
+                }
+
+                $pheanstalkd->delete($job);
+
+            }
+
+            echo $tube . ' jobs was clear~~~' . PHP_EOL;
+
+        } catch (\Pheanstalk\Exception\DeadlineSoonException $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+
+    }
+
+    /**
+     * 清除所有管道的消息
+     */
+    public static function clearAll()
+    {
+
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        $tubes = $pheanstalkd->listTubes();
+
+        foreach ($tubes as $tube) {
+            self::clear($tube);
+        }
+
+    }
+
+    /**
+     * 列出管道消息
+     * @param $tube
+     */
+    public static function statsTube($tube)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $stats = $pheanstalkd->statsTube($tube);
+
+            foreach ($stats as $key => $value) {
+                echo $key . ': ' . $value . PHP_EOL;
+            }
+
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+
+    }
+
 
 }
 
@@ -91,21 +174,41 @@ array_shift($commandList);
 
 $mainCommand = array_shift($commandList);
 
-switch($mainCommand){
+switch ($mainCommand) {
 
     case 'help':
-      MyPheanstalk::showHelps();
-      break;
+        MyPheanstalk::showHelps();
+        break;
     case 'stats':
-      MyPheanstalk::showStats();
-      break;
+        MyPheanstalk::showStats();
+        break;
     case 'listTubes':
         MyPheanstalk::listTubes();
         break;
+    case 'clear':
+        $tube = array_shift($commandList);//管道名称 如果为空，则清空全部消息
 
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            echo 'I think you want to clear all jobs? -- please try "$ php task clearAll"' . PHP_EOL;
+            return;
+        }
+        MyPheanstalk::clear($tube);
+
+        break;
+    case 'clearAll':
+        MyPheanstalk::clearAll();
+        break;
+    case 'statsTube':
+        $tube = array_shift($commandList);//管道名称 如果为空，则清空全部消息
+
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            return;
+        }
+        MyPheanstalk::statsTube($tube);
+        break;
     default:
-
-      MyPheanstalk::showHelps();
-
+        MyPheanstalk::showHelps();
 
 }
