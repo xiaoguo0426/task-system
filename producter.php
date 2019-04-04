@@ -28,5 +28,7 @@ $data = [
         'create_time' => $cur_date
     ]
 ];
-
-$job = $pheanstalkd->useTube($tube)->put(json_encode($data));
+for ($i = 0; $i < 1000; $i++) {
+    $data['index'] = $i;
+    $job = $pheanstalkd->useTube($tube)->put(json_encode($data));
+}

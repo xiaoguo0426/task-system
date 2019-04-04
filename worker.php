@@ -7,6 +7,7 @@
  */
 require 'vendor/autoload.php';
 
+use App\Config;
 use App\Constants;
 use App\Log;
 use App\Pheanstalkd;
@@ -24,7 +25,9 @@ $db = require CONF_PATH . 'db.php';
 
 $app = require CONF_PATH . 'app.php';
 
-Db::setConfig($db);
+Config::loadFile(CONF_PATH . 'db.php');
+
+Db::setConfig(Config::getAll());
 
 class Worker
 {
