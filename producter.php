@@ -7,7 +7,7 @@
  */
 require 'vendor/autoload.php';
 
-use App\Log;
+//use App\Log;
 use App\Pheanstalkd;
 
 $pheanstalkd = Pheanstalkd::getInstance();
@@ -15,8 +15,6 @@ $pheanstalkd = Pheanstalkd::getInstance();
 $tube = 'User';
 
 $cur_date = date('Y-m-d H:i:s');
-
-Log::error(1111);
 
 $data = [
     'module' => $tube,
@@ -32,4 +30,3 @@ $data = [
 ];
 
 $job = $pheanstalkd->useTube($tube)->put(json_encode($data));
-

@@ -8,15 +8,23 @@
 require 'vendor/autoload.php';
 
 use App\Constants;
+use App\Log;
 use App\Pheanstalkd;
 use Think\Db;
-use App\Log;
 
 defined('DS') OR define('DS', DIRECTORY_SEPARATOR);
 
 defined('ROOT_PATH') OR define('ROOT_PATH', __DIR__);
 
+defined('CONF_PATH') OR define('CONF_PATH', ROOT_PATH . DS . 'config' . DS);
+
 defined('LOG_PATH') OR define('LOG_PATH', ROOT_PATH . DS . 'logs' . DS);
+
+$db = require CONF_PATH . 'db.php';
+
+$app = require CONF_PATH . 'app.php';
+
+Db::setConfig($db);
 
 class Worker
 {
@@ -70,16 +78,9 @@ class Worker
 
                 $pheanstalkd->bury($job);
 
-//                $logName = date('Y-m-d') . '.log';
-//
-//                $logPath = './logs';
-//
-//                $logger = new Logger($logName);
-//
-//                $logger->pushHandler(new StreamHandler($logPath . '/' . $logName, Logger::ERROR));
-//
-//                $logger->error($exception->getTraceAsString());
-
+                Log::error('无法处理的消息，请确认后再试~~');
+                Log::error($job->getData());
+                Log::error($exception->getMessage());
             }
 
         }
@@ -87,8 +88,5 @@ class Worker
 
 }
 
-//Worker::run();
+Worker::run();
 
-Log::error(11);
-Log::warn(11);
-Log::notice(11);
