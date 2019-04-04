@@ -38,13 +38,13 @@ class Worker
 
         while (1) {
 
-            try {
+            $job = $pheanstalkd->watch(Constants::ACTIVITY_TUBE)
+                ->watch(Constants::ORDER_TUBE)
+                ->watch(Constants::USER_TUBE)
+                ->ignore('default')
+                ->reserve();
 
-                $job = $pheanstalkd->watch(Constants::ACTIVITY_TUBE)
-                    ->watch(Constants::ORDER_TUBE)
-                    ->watch(Constants::USER_TUBE)
-                    ->ignore('default')
-                    ->reserve();
+            try {
 
                 $job_id = $job->getId();//job id
 

@@ -13,28 +13,46 @@
         
         $pheanstalkd = Pheanstalkd::getInstance();
         
-        $pheanstalkd->useTube('testTube')->put('test data');
+        $tube = 'User';
+        
+        $cur_date = date('Y-m-d H:i:s');
+        
+        $data = [
+            'module' => $tube,              //模块名称
+            'node' => 'User',               //节点名称
+            'action' => 'login',            //消费动作
+            'data' => [                     //消息数据
+                'siteID' => 6688,
+                'userID' => 10086,
+                'nickname' => '锅锅锅',
+                'source' => 'miniapp',
+                'create_time' => $cur_date
+            ]
+        ];
+        
+        $pheanstalkd->useTube($tube)->put($data);
 ```
 ```
-    comsumer:
+    consumer:
     
         $ php ./worker.php
         
         *************************************************************
-    
-        require 'vendor/autoload.php';
         
-        use App\Pheanstalkd;
+        app\Consumers\User\User.php
+       
+        <?php
         
-        $pheanstalkd = Pheanstalkd::getInstance();
+        namespace App\Consumers\User;
         
-        $tubeName = 'testTube';
+        class User
+        {
         
-        while (1) {
-            $job = $pheanstalkd->watch($tubeName)->reserve();
-            //var_dump($job);
-            //TODO
-            $pheanstalkd->delete($job);
+            public function login($data)
+            {
+                //TODO
+            }
+        
         }
 ```
 
