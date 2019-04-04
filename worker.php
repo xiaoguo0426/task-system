@@ -9,9 +9,14 @@ require 'vendor/autoload.php';
 
 use App\Constants;
 use App\Pheanstalkd;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use Think\Db;
+use App\Log;
+
+defined('DS') OR define('DS', DIRECTORY_SEPARATOR);
+
+defined('ROOT_PATH') OR define('ROOT_PATH', __DIR__);
+
+defined('LOG_PATH') OR define('LOG_PATH', ROOT_PATH . DS . 'logs' . DS);
 
 class Worker
 {
@@ -29,7 +34,7 @@ class Worker
                     ->watch(Constants::USER_TUBE)
                     ->ignore('default')
                     ->reserve();
-echo 111;
+
                 $job_id = $job->getId();//job id
 
                 $data = json_decode($job->getData(), true);//消息数据
@@ -65,15 +70,15 @@ echo 111;
 
                 $pheanstalkd->bury($job);
 
-                $logName = date('Y-m-d') . '.log';
-
-                $logPath = './logs';
-
-                $logger = new Logger($logName);
-
-                $logger->pushHandler(new StreamHandler($logPath . '/' . $logName, Logger::ERROR));
-
-                $logger->error($exception->getTraceAsString());
+//                $logName = date('Y-m-d') . '.log';
+//
+//                $logPath = './logs';
+//
+//                $logger = new Logger($logName);
+//
+//                $logger->pushHandler(new StreamHandler($logPath . '/' . $logName, Logger::ERROR));
+//
+//                $logger->error($exception->getTraceAsString());
 
             }
 
@@ -82,5 +87,8 @@ echo 111;
 
 }
 
+//Worker::run();
 
-Worker::run();
+Log::error(11);
+Log::warn(11);
+Log::notice(11);

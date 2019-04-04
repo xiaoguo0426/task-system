@@ -8,12 +8,20 @@
 
 namespace App;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 class Log
 {
-    private static $logName;
 
-    private static $logPath = '';
+    private static $allMethods = [
+        'error',
+        'info',
+        'debug',
+        'notice',
+        'log',
+        'warn'
+    ];
 
     public function __construct()
     {
@@ -25,26 +33,36 @@ class Log
         return date('Y-m-d') . '-' . $type . '.log';
     }
 
-    public static function error($msg)
+    public static function __callStatic($method, $arguments)
     {
-        $logName = self::getLogName(__FUNCTION__);
 
+        if (!in_array($method, self::$allMethods)) {
+            throw new \Exception($method . ' method don\'t exist');
+        }
 
+        return self::writeLog($method, var_export($arguments, true));
     }
 
-    public static function warning($msg)
+    private static function writeLog($logType, $msg)
     {
 
-        $logName = self::getLogName(__FUNCTION__);
+        try {
 
+            $logName = self::getLogName($logType);
 
-    }
+            $logger = new Logger($logName);
 
-    public function notice($msg)
-    {
+            $upper = strtoupper($logType);
 
-        $logName = self::getLogName(__FUNCTION__);
-        
+            $logPath = LOG_PATH . $logName;
+
+            $logger->pushHandler(new StreamHandler($logPath, $upper));
+
+            return $logger->$logType($msg);
+
+        } catch (\Exception $exception) {
+            file_put_contents($logPath, $exception->getMessage());
+        }
 
     }
 
