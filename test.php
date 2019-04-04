@@ -19,20 +19,23 @@ defined('CONF_PATH') OR define('CONF_PATH', ROOT_PATH . DS . 'config' . DS);
 
 $db = require CONF_PATH . 'db.php';
 
-
 Config::loadFile(CONF_PATH . 'db.php');
+
+//Config::load($db);
 
 $key = 'types';
 
 $default = '123123';
 
-Config::set($key, $default);
+//Config::set($key, $default);
 
-Config::del('paginate');
+//Config::del('paginate');
 
-$config = Config::getAll();
+//$config = Config::getAll();
 
-var_dump($config);
+$type = Config::get('paginate.type');
+
+var_dump($type);
 
 
 
