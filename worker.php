@@ -32,52 +32,77 @@ Db::setConfig(Config::getAll());
 class Worker
 {
 
+    private static $workers = [];
+
     public static function run()
     {
-        $pheanstalkd = Pheanstalkd::getInstance();
 
         while (1) {
 
-            $job = $pheanstalkd->watch(Constants::ACTIVITY_TUBE)
-                ->watch(Constants::ORDER_TUBE)
-                ->watch(Constants::USER_TUBE)
-                ->ignore('default')
-                ->reserve();
-
             try {
+                $pheanstalkd = Pheanstalkd::getInstance();
 
-                $job_id = $job->getId();//job id
+                $job = $pheanstalkd->watch(Constants::ACTIVITY_TUBE)
+                    ->watch(Constants::ORDER_TUBE)
+                    ->watch(Constants::USER_TUBE)
+                    ->ignore('default')
+                    ->reserve();
 
-                $data = json_decode($job->getData(), true);//消息数据
+                echo 1111;
+                echo PHP_EOL;
+                go(function () use ($job) {
 
-                $module = $data['module'];
+                    $job_id = $job->getId();//job id
 
-                $node = $data['node'];
+                    $data = json_decode($job->getData(), true);//消息数据
 
-                $method = $data['action'];
+                    $module = $data['module'];
 
-                //构建相应的消费者
-                $class = "App\\Consumers\\" . $module . "\\" . $node;
+                    $node = $data['node'];
 
-                if (!class_exists($class)) {
-                    throw new \Exception('Class ' . $class . ' not found!');
-                }
+                    $method = $data['action'];
 
-                (new $class())->$method($data['data']);
+                    //构建相应的消费者
+                    $class = "App\\Consumers\\" . $module . "\\" . $node;
 
-                $task = [
-                    'site_id' => $data['data']['siteID'],
-                    'job_id' => $job_id,
-                    'data' => $job->getData(),
-                    'create_time' => date('Y-m-d H:i:s')
-                ];
+                    if (!class_exists($class)) {
+                        throw new \Exception('Class ' . $class . ' not found!');
+                    }
 
-                $data = Db::name('jobs')->insert($task);
+                    $index = md5($class);
+                    if (!isset(self::$workers[$index])) {
+                        $obj = new $class();
+                        self::$workers[$index] = $obj;
+                    } else {
+                        $obj = self::$workers[$index];
+                    }
+
+                    $obj->$method($data['data']);
+
+                    echo 2222;
+                    echo PHP_EOL;
+
+                    $task = [
+                        'site_id' => $data['data']['siteID'],
+                        'job_id' => $job_id,
+                        'data' => $job->getData(),
+                        'create_time' => date('Y-m-d H:i:s')
+                    ];
+
+                    $data = Db::name('jobs')->insert($task);
+
+                });
+
+                echo 3333;
+                echo PHP_EOL;
 
                 $pheanstalkd->delete($job);
+
             } catch (\Pheanstalk\Exception\DeadlineSoonException $exception) {
 
             } catch (\Exception $exception) {
+
+                $pheanstalkd = Pheanstalkd::getInstance();
 
                 $pheanstalkd->bury($job);
 

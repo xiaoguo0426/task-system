@@ -16,19 +16,26 @@ $tube = 'User';
 
 $cur_date = date('Y-m-d H:i:s');
 
-$data = [
-    'module' => $tube,
-    'node' => 'User',
-    'action' => 'login',
-    'data' => [
-        'siteID' => 6688,
-        'userID' => 10086,
-        'nickname' => '锅锅锅',
-        'source' => 'miniapp',
-        'create_time' => $cur_date
-    ]
-];
-for ($i = 0; $i < 1000; $i++) {
+$actions = ['login', 'pay', 'test'];
+
+
+for ($i = 0; $i < 60; $i++) {
+
+    $randKey = array_rand($actions);
+
+    $data = [
+        'module' => $tube,
+        'node' => 'User',
+        'action' => $actions[$randKey],
+        'data' => [
+            'siteID' => 6688,
+            'userID' => mt_rand(1000, 9999),
+            'nickname' => '锅锅锅',
+            'source' => 'miniapp',
+            'create_time' => $cur_date
+        ]
+    ];
+
     $data['index'] = $i;
     $job = $pheanstalkd->useTube($tube)->put(json_encode($data));
 }
