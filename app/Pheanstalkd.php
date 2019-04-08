@@ -16,7 +16,7 @@ class Pheanstalkd
 
     private static $pheanstalkd;
 
-    const BEANSTALKD_HOST = 'beanstalkd';
+    const BEANSTALKD_HOST = '127.0.0.1';
 
     const BEANSTALKD_PORT = 11300;
 

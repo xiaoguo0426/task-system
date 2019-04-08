@@ -48,53 +48,41 @@ class Worker
                     ->ignore('default')
                     ->reserve();
 
-                echo 1111;
-                echo PHP_EOL;
-                go(function () use ($job) {
+                $job_id = $job->getId();//job id
 
-                    $job_id = $job->getId();//job id
+                $data = json_decode($job->getData(), true);//消息数据
 
-                    $data = json_decode($job->getData(), true);//消息数据
+                $module = $data['module'];
 
-                    $module = $data['module'];
+                $node = $data['node'];
 
-                    $node = $data['node'];
+                $method = $data['action'];
 
-                    $method = $data['action'];
+                //构建相应的消费者
+                $class = "App\\Consumers\\" . $module . "\\" . $node;
 
-                    //构建相应的消费者
-                    $class = "App\\Consumers\\" . $module . "\\" . $node;
+                if (!class_exists($class)) {
+                    throw new \Exception('Class ' . $class . ' not found!');
+                }
 
-                    if (!class_exists($class)) {
-                        throw new \Exception('Class ' . $class . ' not found!');
-                    }
+                $index = md5($class);
+                if (!isset(self::$workers[$index])) {
+                    $obj = new $class();
+                    self::$workers[$index] = $obj;
+                } else {
+                    $obj = self::$workers[$index];
+                }
 
-                    $index = md5($class);
-                    if (!isset(self::$workers[$index])) {
-                        $obj = new $class();
-                        self::$workers[$index] = $obj;
-                    } else {
-                        $obj = self::$workers[$index];
-                    }
+                $obj->$method($data['data']);
 
-                    $obj->$method($data['data']);
+                $task = [
+                    'site_id' => $data['data']['siteID'],
+                    'job_id' => $job_id,
+                    'data' => $job->getData(),
+                    'create_time' => date('Y-m-d H:i:s')
+                ];
 
-                    echo 2222;
-                    echo PHP_EOL;
-
-                    $task = [
-                        'site_id' => $data['data']['siteID'],
-                        'job_id' => $job_id,
-                        'data' => $job->getData(),
-                        'create_time' => date('Y-m-d H:i:s')
-                    ];
-
-                    $data = Db::name('jobs')->insert($task);
-
-                });
-
-                echo 3333;
-                echo PHP_EOL;
+                $data = Db::name('jobs')->insert($task);
 
                 $pheanstalkd->delete($job);
 
