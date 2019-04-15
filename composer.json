@@ -5,7 +5,8 @@
   "require": {
     "pda/pheanstalk": "^4.0",
     "topthink/think-orm": "^2.0",
-    "monolog/monolog": "^1.24"
+    "monolog/monolog": "^1.24",
+    "symfony/console": "^4.2"
   },
   "autoload": {
     "psr-4": {

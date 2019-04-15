@@ -12,27 +12,24 @@ use App\Pheanstalkd;
 
 $pheanstalkd = Pheanstalkd::getInstance();
 
-$tube = 'User';
+$tube = 'Order';
 
 $cur_date = date('Y-m-d H:i:s');
 
-$actions = ['login', 'pay', 'test'];
+$actions = ['createOrder', 'payOrder'];
 
 
-for ($i = 0; $i < 60; $i++) {
+for ($i = 0; $i < 100; $i++) {
 
     $randKey = array_rand($actions);
 
     $data = [
         'module' => $tube,
-        'node' => 'User',
+        'node' => 'Order',
         'action' => $actions[$randKey],
         'data' => [
             'siteID' => 6688,
             'userID' => mt_rand(1000, 9999),
-            'nickname' => '锅锅锅',
-            'source' => 'miniapp',
-            'create_time' => $cur_date
         ]
     ];
 

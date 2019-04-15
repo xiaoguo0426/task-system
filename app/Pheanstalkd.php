@@ -18,7 +18,7 @@ class Pheanstalkd
 
     const BEANSTALKD_HOST = '127.0.0.1';
 
-    const BEANSTALKD_PORT = 11300;
+    const BEANSTALKD_PORT = 8889;
 
     const BEANSTALKD_TIMEOUT = 10;
 

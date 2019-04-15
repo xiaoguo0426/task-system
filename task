@@ -123,7 +123,7 @@ STATS;
 
             }
 
-            echo $tube . ' jobs was clear~~~' . PHP_EOL;
+            echo $tube . '\'s jobs was Cleaned up~~~' . PHP_EOL;
 
         } catch (\Pheanstalk\Exception\DeadlineSoonException $exception) {
             echo $exception->getMessage() . PHP_EOL;
@@ -235,6 +235,60 @@ STATS;
         }
     }
 
+    public static function peekBuried($tube)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $job = $pheanstalkd->peekBuried($tube);
+
+            if (null !== $job) {
+                $pheanstalkd->kickJob($job);
+                echo 'peekBuried  success~' . PHP_EOL;
+            } else {
+                echo 'there is no buried jobs to peek ~' . PHP_EOL;
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+    }
+
+    public static function kick($tube, $max)
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $job = $pheanstalkd->useTube($tube)->kick($max);
+
+            var_dump($job);
+
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+    }
+
+    public static function kickAll()
+    {
+        $pheanstalkd = Pheanstalkd::getInstance();
+
+        try {
+
+            $tubes = $pheanstalkd->listTubes();
+
+            $max = 9999;
+
+            foreach ($tubes as $tube){
+                $pheanstalkd->useTube($tube)->kick($max);
+            }
+
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
+
+    }
+
 
 }
 
@@ -307,6 +361,33 @@ switch ($mainCommand) {
         $delay = array_shift($commandList);
 
         MyPheanstalk::resumeTube($tube);
+        break;
+    case 'peekBuried':
+
+        $tube = array_shift($commandList);//管道名称
+
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            return;
+        }
+
+        MyPheanstalk::peekBuried($tube);
+        break;
+    case 'kick':
+
+        $tube = array_shift($commandList);//管道名称
+
+        if ('' == $tube) {
+            echo 'sorry,tube name is required.' . PHP_EOL;
+            return;
+        }
+
+        $max = array_shift($commandList);
+
+        MyPheanstalk::kick($tube, $max);
+        break;
+    case 'kickAll':
+        MyPheanstalk::kickAll();
         break;
     default:
         MyPheanstalk::showHelps();

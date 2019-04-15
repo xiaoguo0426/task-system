@@ -25,6 +25,8 @@ $db = require CONF_PATH . 'db.php';
 
 $app = require CONF_PATH . 'app.php';
 
+$redis = require CONF_PATH . 'redis.php';
+
 Config::loadFile(CONF_PATH . 'db.php');
 
 Db::setConfig(Config::getAll());
@@ -47,6 +49,8 @@ class Worker
                     ->watch(Constants::USER_TUBE)
                     ->ignore('default')
                     ->reserve();
+
+                $t1 = microtime(true);//开始时间
 
                 $job_id = $job->getId();//job id
 
@@ -75,6 +79,10 @@ class Worker
 
                 $obj->$method($data['data']);
 
+                $t2 = microtime(true);//结束时间
+
+                echo '任务ID：' . $job_id . '耗时' . round($t2 - $t1, 3) . '秒' . PHP_EOL;
+
                 $task = [
                     'site_id' => $data['data']['siteID'],
                     'job_id' => $job_id,
@@ -84,6 +92,7 @@ class Worker
 
                 $data = Db::name('jobs')->insert($task);
 
+//                $pheanstalkd->release($job);
                 $pheanstalkd->delete($job);
 
             } catch (\Pheanstalk\Exception\DeadlineSoonException $exception) {
@@ -99,6 +108,14 @@ class Worker
                 Log::error($exception->getMessage());
             }
 
+        }
+    }
+
+    public static function init()
+    {
+        // Only for cli.
+        if (php_sapi_name() != "cli") {
+            exit("only run in command line mode \n");
         }
     }
 

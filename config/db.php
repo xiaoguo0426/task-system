@@ -9,13 +9,13 @@
 return [
     'type' => 'mysql',
     // 服务器地址
-    'hostname' => 'mysql',
+    'hostname' => '127.0.0.1',
     // 数据库名
     'database' => 'task-system',
     // 用户名
-    'username' => 'root',
+    'username' => 'homestead',
     // 密码
-    'password' => '123123',
+    'password' => 'secret',
     // 端口
     'hostport' => '3306',
     // 连接dsn
