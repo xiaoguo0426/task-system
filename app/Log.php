@@ -66,4 +66,29 @@ class Log
 
     }
 
+    public static function write($logName, $content)
+    {
+
+        try {
+
+            $type = 'debug';
+
+            $logName = self::getLogName($logName . '-' . $type);
+
+            $logger = new Logger($logName);
+
+            $upper = strtoupper($type);
+
+            $logPath = LOG_PATH . $logName;
+
+            $logger->pushHandler(new StreamHandler($logPath, $upper));
+
+            return $logger->$type($content);
+
+        } catch (\Exception $exception) {
+            file_put_contents($logPath, $exception->getMessage());
+        }
+
+    }
+
 }

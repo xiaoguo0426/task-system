@@ -16,10 +16,10 @@ $tube = 'Order';
 
 $cur_date = date('Y-m-d H:i:s');
 
-$actions = ['createOrder', 'payOrder'];
+$actions = ['payOrder'];
 
 
-for ($i = 0; $i < 100; $i++) {
+for ($i = 0; $i < 1; $i++) {
 
     $randKey = array_rand($actions);
 
@@ -29,10 +29,10 @@ for ($i = 0; $i < 100; $i++) {
         'action' => $actions[$randKey],
         'data' => [
             'siteID' => 6688,
-            'userID' => mt_rand(1000, 9999),
+            'userID' => 154634,
+            'orderID' => time()
         ]
     ];
 
-    $data['index'] = $i;
     $job = $pheanstalkd->useTube($tube)->put(json_encode($data));
 }

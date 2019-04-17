@@ -11,6 +11,7 @@ use App\Config;
 use App\Constants;
 use App\Log;
 use App\Pheanstalkd;
+use App\Redis;
 use Think\Db;
 
 defined('DS') OR define('DS', DIRECTORY_SEPARATOR);
@@ -22,15 +23,29 @@ defined('CONF_PATH') OR define('CONF_PATH', ROOT_PATH . DS . 'config' . DS);
 defined('LOG_PATH') OR define('LOG_PATH', ROOT_PATH . DS . 'logs' . DS);
 
 $db = require CONF_PATH . 'db.php';
+//
+//$app = require CONF_PATH . 'app.php';
+//
+//$redis = require CONF_PATH . 'redis.php';
 
-$app = require CONF_PATH . 'app.php';
+//$files = scandir(CONF_PATH);
+//foreach ($files as $file) {
+//    $f = CONF_PATH . DS . $file;
+//    if (is_file($f)) {
+//        $m = basename($f, '.php');
+//        $config = require $f;
+//        Config::set($m, $config);
+//    }
+//}
 
-$redis = require CONF_PATH . 'redis.php';
-
-Config::loadFile(CONF_PATH . 'db.php');
+Config::load($db);
 
 Db::setConfig(Config::getAll());
 
+//Db::setConfig(Config::get('db'));
+//
+//Redis::setConfig(Config::get('redis'));
+//
 class Worker
 {
 
@@ -68,7 +83,7 @@ class Worker
                 if (!class_exists($class)) {
                     throw new \Exception('Class ' . $class . ' not found!');
                 }
-
+                $pheanstalkd->delete($job);
                 $index = md5($class);
                 if (!isset(self::$workers[$index])) {
                     $obj = new $class();
@@ -76,6 +91,7 @@ class Worker
                 } else {
                     $obj = self::$workers[$index];
                 }
+//                $obj = new $class();
 
                 $obj->$method($data['data']);
 
@@ -90,22 +106,23 @@ class Worker
                     'create_time' => date('Y-m-d H:i:s')
                 ];
 
-                $data = Db::name('jobs')->insert($task);
+                $data = Db::name('notify_jobs')->insert($task);
 
-//                $pheanstalkd->release($job);
                 $pheanstalkd->delete($job);
 
             } catch (\Pheanstalk\Exception\DeadlineSoonException $exception) {
 
             } catch (\Exception $exception) {
 
-                $pheanstalkd = Pheanstalkd::getInstance();
+//                $pheanstalkd = Pheanstalkd::getInstance();
+//
+//                $pheanstalkd->bury($job);
 
-                $pheanstalkd->bury($job);
+                var_dump($exception->getMessage());
 
-                Log::error('无法处理的消息，请确认后再试~~');
-                Log::error($job->getData());
-                Log::error($exception->getMessage());
+//                Log::error('无法处理的消息，请确认后再试~~');
+//                Log::error($job->getData());
+//                Log::error($exception->getMessage());
             }
 
         }
