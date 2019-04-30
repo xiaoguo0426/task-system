@@ -16,17 +16,17 @@ class Pheanstalkd
 
     private static $pheanstalkd;
 
-    const BEANSTALKD_HOST = '127.0.0.1';
+    const HOST = '127.0.0.1';
 
-    const BEANSTALKD_PORT = 8889;
+    const PORT = 8889;
 
-    const BEANSTALKD_TIMEOUT = 10;
+    const TIMEOUT = 10;
 
     public static function getInstance()
     {
 
         if (empty(self::$pheanstalkd)) {
-            self::$pheanstalkd = Pheanstalk::create(self::BEANSTALKD_HOST, self::BEANSTALKD_PORT, self::BEANSTALKD_TIMEOUT);
+            self::$pheanstalkd = Pheanstalk::create(self::HOST, self::PORT, self::TIMEOUT);
         }
         return self::$pheanstalkd;
     }

@@ -5,6 +5,15 @@
 # Usage
 
 ```
+
+    beanstalkd 
+       
+       $ ps aux | grep beanstalkd
+       
+       $ sudo kill -9
+       
+       $ beanstalkd -l 0.0.0.0 -p 8889 &
+
     producter:
         
         require 'vendor/autoload.php';

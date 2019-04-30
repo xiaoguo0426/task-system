@@ -9,7 +9,6 @@ require 'vendor/autoload.php';
 
 use App\Config;
 use App\Constants;
-use App\Log;
 use App\Pheanstalkd;
 use App\Redis;
 use Think\Db;
@@ -22,30 +21,20 @@ defined('CONF_PATH') OR define('CONF_PATH', ROOT_PATH . DS . 'config' . DS);
 
 defined('LOG_PATH') OR define('LOG_PATH', ROOT_PATH . DS . 'logs' . DS);
 
-$db = require CONF_PATH . 'db.php';
-//
-//$app = require CONF_PATH . 'app.php';
-//
-//$redis = require CONF_PATH . 'redis.php';
+$files = scandir(CONF_PATH);
 
-//$files = scandir(CONF_PATH);
-//foreach ($files as $file) {
-//    $f = CONF_PATH . DS . $file;
-//    if (is_file($f)) {
-//        $m = basename($f, '.php');
-//        $config = require $f;
-//        Config::set($m, $config);
-//    }
-//}
+$config = [];
+foreach ($files as $file) {
+    if ('.' !== $file && '..' !== $file) {
+        $conf = require CONF_PATH . $file;
+        $config = array_merge($config, $conf);
+    }
+}
 
-Config::load($db);
+Config::load($config);
+Db::setConfig(Config::get('db'));
+Redis::setConfig(Config::get('redis'));
 
-Db::setConfig(Config::getAll());
-
-//Db::setConfig(Config::get('db'));
-//
-//Redis::setConfig(Config::get('redis'));
-//
 class Worker
 {
 
@@ -53,15 +42,16 @@ class Worker
 
     public static function run()
     {
+        $pheanstalkd = Pheanstalkd::getInstance();
 
         while (1) {
 
             try {
-                $pheanstalkd = Pheanstalkd::getInstance();
 
-                $job = $pheanstalkd->watch(Constants::ACTIVITY_TUBE)
-                    ->watch(Constants::ORDER_TUBE)
-                    ->watch(Constants::USER_TUBE)
+                $job = $pheanstalkd->watch(Constants::TUBE_ACTIVITY)
+                    ->watch(Constants::TUBE_ORDER)
+                    ->watch(Constants::TUBE_TRADER)
+                    ->watch(Constants::TUBE_USER)
                     ->ignore('default')
                     ->reserve();
 
@@ -83,7 +73,7 @@ class Worker
                 if (!class_exists($class)) {
                     throw new \Exception('Class ' . $class . ' not found!');
                 }
-                $pheanstalkd->delete($job);
+
                 $index = md5($class);
                 if (!isset(self::$workers[$index])) {
                     $obj = new $class();
@@ -91,8 +81,8 @@ class Worker
                 } else {
                     $obj = self::$workers[$index];
                 }
-//                $obj = new $class();
 
+                //$obj = new $class();
                 $obj->$method($data['data']);
 
                 $t2 = microtime(true);//结束时间
@@ -117,8 +107,10 @@ class Worker
 //                $pheanstalkd = Pheanstalkd::getInstance();
 //
 //                $pheanstalkd->bury($job);
-
                 var_dump($exception->getMessage());
+                var_dump($exception->getTraceAsString());
+
+                var_dump($exception->getLine());
 
 //                Log::error('无法处理的消息，请确认后再试~~');
 //                Log::error($job->getData());
@@ -134,6 +126,9 @@ class Worker
         if (php_sapi_name() != "cli") {
             exit("only run in command line mode \n");
         }
+        // Only for linux
+
+        // Check extension
     }
 
 }

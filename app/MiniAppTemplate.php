@@ -51,8 +51,13 @@ class MiniAppTemplate
 
     /**
      * 支付成功
+     * @param $orderMoney
+     * @param $orderItemsText
+     * @param $orderTime
+     * @param $remark
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      */
-    public function paySuccess($nickname, $orderNo, $orderItems)
+    public function paySuccess($orderMoney, $orderItemsText, $orderTime, $remark)
     {
 
         $instance = $this->app->getTemplateMessageInstance();
@@ -64,14 +69,41 @@ class MiniAppTemplate
             'page' => $this->page,
             'form_id' => $this->formID,
             'data' => [
-                'keyword1' => $nickname,
-                'keyword2' => $orderNo,
-                'keyword3' => $orderNo
+                'keyword1' => $orderTime,
+                'keyword2' => $orderItemsText,
+                'keyword3' => $orderMoney,
+                'keyword4' => $remark,
+            ],
+        ]);
+        var_dump($send);
+    }
+
+    /**
+     * 物流订单发货 小程序模板消息
+     * @param $orderNo          string   订单号
+     * @param $orderMoney       float    订单金额
+     * @param $orderItemsText   string   订单商品简述
+     * @param $deliveryNo       string   物流订单号
+     * @param $deliverName      string   物流公司名称
+     */
+    public function delivery($orderNo, $orderMoney, $orderItemsText, $deliveryNo, $deliverName)
+    {
+        $instance = $this->app->getTemplateMessageInstance();
+
+        //构建消息
+        $send = $instance->send([
+            'touser' => $this->openID,
+            'template_id' => $this->templateID,
+            'page' => $this->page,
+            'form_id' => $this->formID,
+            'data' => [
+                'keyword1' => $orderMoney,
+                'keyword2' => $orderItemsText,
+                'keyword3' => $deliverName,
+                'keyword4' => $deliveryNo,
+                'keyword5' => $orderNo,
             ],
         ]);
 
-        $send['errcode'];
-
     }
-
 }

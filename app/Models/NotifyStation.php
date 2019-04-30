@@ -8,7 +8,7 @@
 
 namespace App\Models;
 
-class NotifyStation extends \Think\Model
+class NotifyStation extends BaseModel
 {
 
 }

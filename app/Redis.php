@@ -29,7 +29,7 @@ class Redis
 
             $redis = new \Redis();
 
-            $redis->connect($config['port'], $config['port']);
+            $redis->connect($config['host'], $config['port']);
 
             $redis->auth($config['auth']);
 

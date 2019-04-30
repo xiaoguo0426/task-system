@@ -5,6 +5,7 @@
  * Date: 2019/4/15
  * Time: 18:12
  */
+
 namespace App;
 
 Class Test
@@ -23,7 +24,7 @@ Class Test
 
 }
 
-for ($i = 0; $i < 10; $i++) {
+for ($i = 0; $i < 5; $i++) {
 
     echo '111' . PHP_EOL;
     $test = new \App\Test();

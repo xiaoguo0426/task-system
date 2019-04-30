@@ -19,7 +19,7 @@ class WxAppService
      */
     public function getMiniAppInfo($siteID)
     {
-        $info = $this->getInfo($siteID, 'AppID as appid,AppSecret as appSecret');
+        $info = $this->getInfo($siteID, 'AppID as appid,AppSecret as appSecret,Name as appName');
 
         return $info;
     }

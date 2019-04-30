@@ -19,9 +19,9 @@ class Sms
 
     private $smsPassword;
 
-    private $smsReceiveMobile;
+    protected $smsReceiveMobile;
 
-    private $smsSign;
+    protected $smsSign;
 
     public function __construct($siteID)
     {
@@ -30,7 +30,7 @@ class Sms
 
         $config = $user->getSmsInfo($siteID);
 
-        if (empty($config)) {
+        if ($config->isEmpty()) {
             throw new \Exception('短信配置无效');
         }
 
@@ -40,26 +40,6 @@ class Sms
         $this->smsSign = $config['smsSign'];
     }
 
-    /**
-     * 未支付短信
-     */
-    public function noPay()
-    {
-
-    }
-
-    /**
-     * 支付成功
-     */
-    public function paySuccess($mobile, $nickname, $orderNo)
-    {
-
-        $content = '亲爱的%s,您的订单%s正在快马加鞭向您奔来~【%s】';
-
-        $content = sprintf($content, $nickname, $orderNo, $this->smsSign);
-
-        $this->send($mobile, $content);
-    }
 
     public function send($mobile, $content)
     {
@@ -72,14 +52,13 @@ class Sms
         ];
 
         try {
-//            $client = new Client();
+            $client = new Client();
 
             $query = http_build_query($data);
-
             Log::debug($query);
-//            $res = $client->request('GET', 'http://www.72dns.com/smsadmin/Sms_Api.aspx/?' . $query);
+            $res = $client->request('GET', 'http://www.72dns.com/smsadmin/Sms_Api.aspx/?' . $query);
 
-//            Log::debug($res->getBody());
+            Log::debug($res->getBody());
         } catch (\GuzzleHttp\Exception\GuzzleException $exception) {
             Log::error($exception->getMessage());
         }

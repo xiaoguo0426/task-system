@@ -42,7 +42,7 @@ class WxApp
                 'file' => LOG_PATH . 'wechat.log',
             ]
         ];
-
+var_dump($config);
         $this->app = Factory::miniProgram($config);
     }
 

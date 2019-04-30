@@ -1,16 +1,18 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: xiaoguo
- * Date: 19-4-2
- * Time: 下午9:08
+ * User: Administrator
+ * Date: 2019/4/10
+ * Time: 17:40
  */
-require 'vendor/autoload.php';
 
-//use App\Log;
-use App\Pheanstalkd;
+$rk = new RdKafka\Producer();
+$rk->setLogLevel(LOG_ERR);
+$rk->addBrokers("127.0.0.1");
 
-$pheanstalkd = Pheanstalkd::getInstance();
+
+
+$topic = $rk->newTopic("test");
 
 $tube = 'Order';
 
@@ -20,9 +22,7 @@ $actions = ['payOrder'];
 
 $orders = [
     '201904231648214313077',
-//    '201904151740387125082'
 ];
-
 
 for ($i = 0; $i < 1; $i++) {
 
@@ -40,5 +40,5 @@ for ($i = 0; $i < 1; $i++) {
         ]
     ];
 
-    $job = $pheanstalkd->useTube($tube)->put(json_encode($data));
+    $topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($data));
 }
