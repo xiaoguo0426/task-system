@@ -104,6 +104,6 @@ class WxAppFormID
     {
         // 先清除无效form_id
         self::remInvalidFormId($siteID, $user_id);
-        return self::getRedisHandle()->zSize(self::getFormKey($siteID, $user_id));
+        return self::getRedisHandle()->zCard(self::getFormKey($siteID, $user_id));
     }
 }

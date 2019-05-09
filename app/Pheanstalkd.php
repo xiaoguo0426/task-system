@@ -16,9 +16,9 @@ class Pheanstalkd
 
     private static $pheanstalkd;
 
-    const HOST = '127.0.0.1';
+    const HOST = 'beanstalkd';
 
-    const PORT = 8889;
+    const PORT = 11300;
 
     const TIMEOUT = 10;
 
