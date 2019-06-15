@@ -103,7 +103,7 @@ STATS;
     }
 
     /**
-     * 清除执行管道的消息
+     * 清除指定管道的消息
      * @param $tube
      */
     public static function clear($tube)

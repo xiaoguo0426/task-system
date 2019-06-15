@@ -32,9 +32,9 @@ class WxAppFormID
 
     /**
      * 保存form_id
+     * @param $siteID
      * @param $user_id
      * @param $form_id
-     * @return mixed
      */
     public static function saveFormId($siteID, $user_id, $form_id)
     {
@@ -75,9 +75,10 @@ class WxAppFormID
 
     /**
      * 删除指定form_id
+     * @param $siteID
      * @param $user_id
      * @param $form_id
-     * @return mixed
+     * @return int
      */
     public static function delFormId($siteID, $user_id, $form_id)
     {
@@ -86,8 +87,9 @@ class WxAppFormID
 
     /**
      * 移除无效（过期的）form_id
+     * @param $siteID
      * @param $user_id
-     * @return mixed
+     * @return int
      */
     public static function remInvalidFormId($siteID, $user_id)
     {
@@ -104,6 +106,6 @@ class WxAppFormID
     {
         // 先清除无效form_id
         self::remInvalidFormId($siteID, $user_id);
-        return self::getRedisHandle()->zSize(self::getFormKey($siteID, $user_id));
+        return self::getRedisHandle()->zCard(self::getFormKey($siteID, $user_id));
     }
 }

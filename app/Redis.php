@@ -22,9 +22,7 @@ class Redis
 
     public static function getInstance()
     {
-
         if (empty(self::$instance)) {
-
             $config = self::_parseConfig();
 
             $redis = new \Redis();
@@ -42,7 +40,6 @@ class Redis
 
     private static function _parseConfig()
     {
-
         if (!empty(self::$config)) {
 
             $config = [

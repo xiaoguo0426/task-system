@@ -4,22 +4,21 @@
   "license": "MIT",
   "require": {
     "pda/pheanstalk": "^4.0",
-    "topthink/think-orm": "^2.0",
+    "topthink/think-orm": "2.0.0",
     "monolog/monolog": "^1.24",
     "symfony/console": "^4.2",
     "guzzlehttp/guzzle": "^6.3",
     "overtrue/wechat": "~4.0",
-    "kwn/php-rdkafka-stubs": "^1.2"
+    "squizlabs/php_codesniffer": "*",
+    "friendsofphp/php-cs-fixer": "^2.15",
+    "mnapoli/silly": "^1.7"
   },
   "autoload": {
     "psr-4": {
       "App\\": "app"
     }
   },
-  "repositories": {
-    "packagist": {
-      "type": "composer",
-      "url": "https://packagist.phpcomposer.com"
-    }
+  "require-dev": {
+    "nunomaduro/phpinsights": "^1.5"
   }
 }

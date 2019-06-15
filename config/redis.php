@@ -8,8 +8,8 @@
 
 return [
     'redis' => [
-        'host' => '192.168.1.186',
+        'host' => '192.168.10.10',
         'port' => '6379',
-        'auth' => 'hsqmmkkrr'
+        'auth' => ''
     ]
 ];
